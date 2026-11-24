@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>RISRC – Club Group Field Session Request</title>
+<style>
+:root{--navy:#14325c;--red:#b3262d;--bg:#f3f5f9;--line:#cfd6e2;--ok:#1b7a3d;--err:#b3262d}
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:#1c2430;line-height:1.45}
+header{background:var(--navy);color:#fff;padding:22px 16px;text-align:center}
+header h1{margin:0;font-size:1.5rem}
+header p{margin:6px 0 0;opacity:.85;font-size:.95rem}
+main{max-width:860px;margin:0 auto;padding:16px}
+.card{background:#fff;border:1px solid var(--line);border-radius:10px;padding:18px;margin:14px 0;box-shadow:0 1px 2px rgba(0,0,0,.04)}
+.card h2{margin:0 0 4px;font-size:1.15rem;color:var(--navy)}
+.hint{color:#5a6678;font-size:.9rem;margin:0 0 12px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.full{grid-column:1/-1}
+@media(max-width:620px){.grid{grid-template-columns:1fr}}
+label{display:block;font-weight:600;font-size:.9rem;margin-bottom:4px}
+.req::after{content:" *";color:var(--err)}
+input,textarea{width:100%;padding:10px;border:1px solid var(--line);border-radius:6px;font:inherit;background:#fff}
+input:focus,textarea:focus{outline:2px solid #6c8fc7;border-color:#6c8fc7}
+input.bad,textarea.bad{border-color:var(--err);background:#fff6f6}
+.msg{color:var(--err);font-size:.82rem;min-height:1em;margin-top:2px}
+.ref{border:1px solid var(--line);border-radius:8px;padding:14px;margin:12px 0;background:#fbfcfe}
+.ref-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.ref-head h3{margin:0;font-size:1rem}
+.badge{display:inline-block;font-size:.75rem;padding:2px 8px;border-radius:99px;margin-left:8px;background:#e7ecf5;color:var(--navy)}
+.badge.minor{background:#fdeaea;color:var(--red)}
+.guardian{display:none;margin-top:10px;padding:12px;border-left:4px solid var(--red);background:#fff7f7;border-radius:6px}
+.guardian.show{display:block}
+button{font:inherit;cursor:pointer;border-radius:8px;border:0;padding:11px 18px}
+.btn-add{background:var(--navy);color:#fff}
+.btn-rm{background:#fff;color:var(--red);border:1px solid var(--red);padding:6px 12px}
+.btn-submit{background:var(--red);color:#fff;font-weight:700;font-size:1.05rem;width:100%;padding:14px}
+button:disabled{opacity:.6;cursor:not-allowed}
+.counter{font-weight:700;color:var(--navy)}
+.consent{display:flex;gap:10px;align-items:flex-start}
+.consent input{width:auto;margin-top:4px}
+.notice{font-size:.85rem;color:#3b4658;background:#eef3fb;border-radius:8px;padding:12px}
+#status{margin:12px 0;padding:14px;border-radius:8px;display:none}
+#status.ok{display:block;background:#e8f6ed;color:var(--ok);border:1px solid #b6e0c4}
+#status.err{display:block;background:#fdeeee;color:var(--err);border:1px solid #f0c4c4}
+.hp{position:absolute;left:-9999px;opacity:0;height:0;width:0}
+footer{text-align:center;color:#5a6678;font-size:.8rem;padding:18px}
+</style>
+</head>
+<body>
+<header>
+  <h1>RISRC – Club Group Field Session Request</h1>
+  <p>Rhode Island State Referee Committee</p>
+</header>
+<main>
+<form id="f" novalidate autocomplete="off">
+  <div class="card">
+    <p style="margin:0">This form allows soccer clubs to submit a group request for referees who need to complete their required on-field training session. Please provide your club information and add all participating referees before submitting your request.</p>
+  </div>
+
+  <div class="card">
+    <h2>Club information</h2>
+    <p class="hint">Fields marked * are required.</p>
+    <div class="grid">
+      <div class="full"><label class="req" for="clubName">Club or organization name</label><input id="clubName" maxlength="150"><div class="msg"></div></div>
+      <div><label class="req" for="contactName">Point of contact full name</label><input id="contactName" maxlength="120" autocomplete="name"><div class="msg"></div></div>
+      <div><label class="req" for="contactEmail">Point of contact email</label><input id="contactEmail" type="email" maxlength="200" autocomplete="email"><div class="msg"></div></div>
+      <div><label class="req" for="contactPhone">Point of contact phone</label><input id="contactPhone" type="tel" maxlength="30" autocomplete="tel"><div class="msg"></div></div>
+      <div><label for="preferredDate">Preferred field session date</label><input id="preferredDate" type="date"><div class="msg"></div></div>
+      <div class="full"><label for="preferredLocation">Preferred field location</label><input id="preferredLocation" maxlength="200"><div class="msg"></div></div>
+      <div class="full"><label for="comments">Additional comments</label><textarea id="comments" rows="3" maxlength="1500"></textarea><div class="msg"></div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Referees <span class="counter" id="counter"></span></h2>
+    <p class="hint">Add every referee who needs an on-field session. Referees under 18 require parent/guardian contact details.</p>
+    <div id="refs"></div>
+    <button type="button" class="btn-add" id="add">+ Add Another Referee</button>
+  </div>
+
+  <div class="card">
+    <h2>Privacy and guardian consent</h2>
+    <div class="notice">The information submitted is used only by the Rhode Island State Referee Committee to schedule and administer field sessions. It is stored in a private, access-restricted system and is not sold or shared with third parties. For referees under 18, the parent or guardian listed is the primary contact.</div>
+    <div class="consent" style="margin-top:12px">
+      <input type="checkbox" id="consent"><label for="consent" class="req" style="font-weight:500">I confirm I am authorized to submit this information on behalf of the club and every listed referee. For each referee under 18, I confirm the parent or guardian listed has consented to the submission and to being contacted by RISRC.</label>
+    </div>
+    <div class="msg" id="consentMsg"></div>
+  </div>
+
+  <input class="hp" type="text" id="botcheck" tabindex="-1" autocomplete="off" aria-hidden="true">
+  <div id="status" role="status"></div>
+  <button type="submit" class="btn-submit" id="submit">Submit Request</button>
+</form>
+</main>
+<footer>Rhode Island State Referee Committee · info@risrc.us</footer>
+
+<script>
+(function(){
+"use strict";
+var ACCESS_KEY="01eef7e5-6657-407d-b3a3-ad5c6cb90a30";
+var ENDPOINT="https://api.web3forms.com/submit";
+var MAX_REFEREES=300;
+var refs=document.getElementById("refs"), counter=document.getElementById("counter");
+var seq=0;
+
+function el(h){var d=document.createElement("div");d.innerHTML=h.trim();return d.firstChild;}
+function ageOn(dobStr){
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(dobStr))return null;
+  var p=dobStr.split("-"),y=+p[0],m=+p[1],d=+p[2];
+  var dt=new Date(y,m-1,d); if(dt.getFullYear()!==y||dt.getMonth()!==m-1||dt.getDate()!==d)return null;
+  var n=new Date(),a=n.getFullYear()-y;
+  if(n.getMonth()<m-1||(n.getMonth()===m-1&&n.getDate()<d))a--;
+  return a;
+}
+function addRef(){
+  if(refs.children.length>=MAX_REFEREES){alert("Maximum "+MAX_REFEREES+" referees per request. Please submit a second request.");return;}
+  var id=++seq;
+  var c=el('<div class="ref" data-id="'+id+'">'+
+  '<div class="ref-head"><h3><span class="num"></span><span class="badge status"></span></h3><button type="button" class="btn-rm">Remove Referee</button></div>'+
+  '<div class="grid">'+
+  '<div><label class="req">First name</label><input data-k="firstName" maxlength="80" autocomplete="off"><div class="msg"></div></div>'+
+  '<div><label class="req">Last name</label><input data-k="lastName" maxlength="80" autocomplete="off"><div class="msg"></div></div>'+
+  '<div><label class="req">Date of birth</label><input data-k="dob" type="date" min="1900-01-01"><div class="msg"></div></div>'+
+  '<div><label class="emailLbl">Email address</label><input data-k="email" type="email" maxlength="200" autocomplete="off"><div class="msg"></div></div>'+
+  '<div><label class="phoneLbl">Phone number</label><input data-k="phone" type="tel" maxlength="30" autocomplete="off"><div class="msg"></div></div>'+
+  '</div>'+
+  '<div class="guardian"><strong>Parent / guardian (required for referees under 18)</strong>'+
+  '<div class="grid" style="margin-top:8px">'+
+  '<div class="full"><label class="req">Parent or guardian full name</label><input data-k="guardianName" maxlength="120"><div class="msg"></div></div>'+
+  '<div><label class="req">Parent or guardian email</label><input data-k="guardianEmail" type="email" maxlength="200"><div class="msg"></div></div>'+
+  '<div><label class="req">Parent or guardian phone</label><input data-k="guardianPhone" type="tel" maxlength="30"><div class="msg"></div></div>'+
+  '</div></div></div>');
+  c.querySelector(".btn-rm").onclick=function(){
+    if(refs.children.length<=1){alert("At least one referee is required.");return;}
+    c.remove();renumber();
+  };
+  c.querySelector('[data-k="dob"]').addEventListener("input",function(){refresh(c);});
+  c.querySelector('[data-k="dob"]').addEventListener("change",function(){refresh(c);});
+  refs.appendChild(c);renumber();refresh(c);
+  return c;
+}
+function isMinor(c){var a=ageOn(c.querySelector('[data-k="dob"]').value);return a!==null&&a<18;}
+function refresh(c){
+  var a=ageOn(c.querySelector('[data-k="dob"]').value), minor=a!==null&&a<18;
+  c.querySelector(".guardian").classList.toggle("show",minor);
+  var b=c.querySelector(".status");
+  b.textContent=a===null?"":(minor?"Under 18 – guardian required":"Age "+a);
+  b.className="badge status"+(minor?" minor":"");
+  var e=c.querySelector(".emailLbl"),p=c.querySelector(".phoneLbl");
+  e.className="emailLbl"+(minor?"":" req"); p.className="phoneLbl"+(minor?"":" req");
+  e.textContent=minor?"Email address (optional)":"Email address";
+  p.textContent=minor?"Phone number (optional)":"Phone number";
+}
+function renumber(){
+  var list=refs.children;
+  for(var i=0;i<list.length;i++)list[i].querySelector(".num").textContent="Referee #"+(i+1);
+  counter.textContent="· "+list.length+" referee"+(list.length===1?"":"s");
+}
+function setErr(input,msg){
+  input.classList.toggle("bad",!!msg);
+  var m=input.parentNode.querySelector(".msg"); if(m)m.textContent=msg||"";
+  return !msg;
+}
+var emailRe=/^[^\s@<>]+@[^\s@<>]+\.[^\s@<>]{2,}$/, phoneRe=/^[0-9+().\-\s]{7,30}$/;
+function vReq(i,label){return setErr(i,i.value.trim()?"":label+" is required.");}
+function vEmail(i,req){var v=i.value.trim();if(!v)return setErr(i,req?"Email is required.":"");return setErr(i,emailRe.test(v)?"":"Enter a valid email address.");}
+function vPhone(i,req){var v=i.value.trim();if(!v)return setErr(i,req?"Phone is required.":"");return setErr(i,phoneRe.test(v)&&(v.replace(/\D/g,"").length>=7)?"":"Enter a valid phone number.");}
+
+function validate(){
+  var ok=true,first=null;
+  function t(r,i){if(!r){ok=false;if(!first)first=i;}}
+  var q=function(id){return document.getElementById(id);};
+  t(vReq(q("clubName"),"Club name"),q("clubName"));
+  t(vReq(q("contactName"),"Contact name"),q("contactName"));
+  t(vEmail(q("contactEmail"),true),q("contactEmail"));
+  t(vPhone(q("contactPhone"),true),q("contactPhone"));
+  Array.prototype.forEach.call(refs.children,function(c){
+    var g=function(k){return c.querySelector('[data-k="'+k+'"]');};
+    t(vReq(g("firstName"),"First name"),g("firstName"));
+    t(vReq(g("lastName"),"Last name"),g("lastName"));
+    var dob=g("dob"), a=ageOn(dob.value);
+    var dobOk=setErr(dob,!dob.value?"Date of birth is required.":(a===null||a<0||a>100?"Enter a valid date of birth.":""));
+    t(dobOk,dob);
+    var minor=a!==null&&a<18;
+    t(vEmail(g("email"),!minor),g("email"));
+    t(vPhone(g("phone"),!minor),g("phone"));
+    if(minor){
+      t(vReq(g("guardianName"),"Guardian name"),g("guardianName"));
+      t(vEmail(g("guardianEmail"),true),g("guardianEmail"));
+      t(vPhone(g("guardianPhone"),true),g("guardianPhone"));
+    }
+  });
+  var cons=q("consent");document.getElementById("consentMsg").textContent=cons.checked?"":"Consent confirmation is required.";
+  if(!cons.checked){ok=false;if(!first)first=cons;}
+  if(first&&first.scrollIntoView)first.scrollIntoView({behavior:"smooth",block:"center"});
+  return ok;
+}
+function b64(str){var b=new TextEncoder().encode(str),s="";for(var i=0;i<b.length;i++)s+=String.fromCharCode(b[i]);return btoa(s);}
+function uuid(){return (window.crypto&&crypto.randomUUID)?crypto.randomUUID():("k"+Date.now()+Math.random().toString(16).slice(2));}
+var submissionKey=uuid(), submitted=false;
+
+function buildPayload(){
+  var q=function(id){return document.getElementById(id).value.trim();};
+  var arr=[];
+  Array.prototype.forEach.call(refs.children,function(c){
+    var g=function(k){return c.querySelector('[data-k="'+k+'"]').value.trim();};
+    var minor=isMinor(c);
+    arr.push({firstName:g("firstName"),lastName:g("lastName"),dob:g("dob"),email:g("email"),phone:g("phone"),
+      guardianName:minor?g("guardianName"):"",guardianEmail:minor?g("guardianEmail"):"",guardianPhone:minor?g("guardianPhone"):""});
+  });
+  return {submissionKey:submissionKey,clubName:q("clubName"),contactName:q("contactName"),contactEmail:q("contactEmail"),
+    contactPhone:q("contactPhone"),preferredDate:q("preferredDate"),preferredLocation:q("preferredLocation"),comments:q("comments"),
+    consent:document.getElementById("consent").checked,isTest:/[?&]test=1/.test(location.search),referees:arr};
+}
+var st=document.getElementById("status"),btn=document.getElementById("submit");
+function show(cls,msg){st.className=cls;st.textContent=msg;st.scrollIntoView({behavior:"smooth",block:"center"});}
+
+document.getElementById("add").onclick=function(){var c=addRef();c.querySelector('[data-k="firstName"]').focus();};
+document.getElementById("f").addEventListener("submit",function(ev){
+  ev.preventDefault();
+  if(submitted||btn.disabled)return;
+  if(document.getElementById("botcheck").value){return;}
+  st.className="";st.textContent="";
+  if(!validate()){show("err","Please correct the highlighted fields and submit again.");return;}
+  var p=buildPayload();
+  var fd=new FormData();
+  fd.append("access_key",ACCESS_KEY);
+  fd.append("subject","RISRC-FIELD-REQUEST"+(p.isTest?" TEST":""));
+  fd.append("from_name","RISRC Field Session Form");
+  fd.append("botcheck","");
+  fd.append("message","RISRCDATA:"+b64(JSON.stringify(p))+":ENDRISRCDATA");
+  btn.disabled=true;btn.textContent="Submitting…";
+  fetch(ENDPOINT,{method:"POST",headers:{"Accept":"application/json"},body:fd})
+  .then(function(r){return r.json().then(function(j){return {ok:r.ok&&j.success,j:j};});})
+  .then(function(res){
+    if(!res.ok)throw new Error((res.j&&res.j.message)||"Submission failed");
+    submitted=true;
+    document.getElementById("f").style.display="none";
+    var done=el('<div class="card" style="text-align:center"><h2 style="color:#1b7a3d">Request submitted</h2>'+
+      '<p>Thank you. Your group field session request for <strong>'+p.referees.length+' referee'+(p.referees.length===1?"":"s")+'</strong> has been received.</p>'+
+      '<p>A confirmation email with your request reference will be sent to the contact email you provided within a few minutes. If you do not receive it, check your spam folder or contact info@risrc.us.</p></div>');
+    document.querySelector("main").appendChild(done);window.scrollTo(0,0);
+  })
+  .catch(function(e){btn.disabled=false;btn.textContent="Submit Request";
+    show("err","Your request could not be submitted ("+e.message+"). Please try again, or contact info@risrc.us.");});
+});
+addRef();
+})();
+</script>
+</body>
+</html>
