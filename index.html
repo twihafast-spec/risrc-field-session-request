@@ -75,7 +75,7 @@ footer{text-align:center;color:#5a6678;font-size:.8rem;padding:18px}
 
   <div class="card">
     <h2>Referees <span class="counter" id="counter"></span></h2>
-    <p class="hint">Add every referee who needs an on-field session. Referees under 18 require parent/guardian contact details.</p>
+    <p class="hint">A minimum of 5 referees is required per group field session request. Add every referee who needs an on-field session. Referees under 18 require parent/guardian contact details.</p>
     <div id="refs"></div>
     <button type="button" class="btn-add" id="add">+ Add Another Referee</button>
   </div>
@@ -101,7 +101,7 @@ footer{text-align:center;color:#5a6678;font-size:.8rem;padding:18px}
 "use strict";
 var ACCESS_KEY="01eef7e5-6657-407d-b3a3-ad5c6cb90a30";
 var ENDPOINT="https://api.web3forms.com/submit";
-var MAX_REFEREES=300;
+var MAX_REFEREES=300, MIN_REFEREES=5;
 var refs=document.getElementById("refs"), counter=document.getElementById("counter");
 var seq=0;
 
@@ -133,7 +133,7 @@ function addRef(){
   '<div><label class="req">Parent or guardian phone</label><input data-k="guardianPhone" type="tel" maxlength="30"><div class="msg"></div></div>'+
   '</div></div></div>');
   c.querySelector(".btn-rm").onclick=function(){
-    if(refs.children.length<=1){alert("At least one referee is required.");return;}
+    if(refs.children.length<=MIN_REFEREES){alert("A minimum of "+MIN_REFEREES+" referees is required per group request.");return;}
     c.remove();renumber();
   };
   c.querySelector('[data-k="dob"]').addEventListener("input",function(){refresh(c);});
@@ -192,6 +192,7 @@ function validate(){
       t(vPhone(g("guardianPhone"),true),g("guardianPhone"));
     }
   });
+  if(refs.children.length<MIN_REFEREES){ok=false;alert("A minimum of "+MIN_REFEREES+" referees is required to submit a group field session request.");if(!first)first=document.getElementById("add");}
   var cons=q("consent");document.getElementById("consentMsg").textContent=cons.checked?"":"Consent confirmation is required.";
   if(!cons.checked){ok=false;if(!first)first=cons;}
   if(first&&first.scrollIntoView)first.scrollIntoView({behavior:"smooth",block:"center"});
@@ -246,7 +247,7 @@ document.getElementById("f").addEventListener("submit",function(ev){
   .catch(function(e){btn.disabled=false;btn.textContent="Submit Request";
     show("err","Your request could not be submitted ("+e.message+"). Please try again, or contact info@risrc.us.");});
 });
-addRef();
+for(var i=0;i<MIN_REFEREES;i++)addRef();
 })();
 </script>
 </body>
